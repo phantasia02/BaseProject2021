@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
-
+using UnityEngine.UI;
 /// <summary>
 /// The UI for displaying result
 /// </summary>
@@ -9,6 +9,12 @@ public class ResultUI : MonoBehaviour
 {
     private Animator _animator;
     private readonly int _successAnimParam = Animator.StringToHash("success");
+
+    [SerializeField] protected Button m_Next = null;
+    public Button Next => m_Next;
+
+    [SerializeField] protected Button m_Over = null;
+    public Button Over => m_Over;
 
     private void Awake()
     {
