@@ -40,6 +40,17 @@ public class CGameManager : MonoBehaviour
     [Header("Result OBJ")]
     [SerializeField] protected GameObject   m_WinObjAnima                   = null;
     [SerializeField] protected GameObject   m_OverObjAnima                  = null;
+    [SerializeField] protected Transform    m_CurVcamObjAnima               = null;
+    public Transform CurVcamObjAnima => m_CurVcamObjAnima;
+
+    [SerializeField] protected GameObject[] m_TimeGameObject = null;
+    public GameObject GetTimeObj(int index)
+    {
+        if (m_TimeGameObject.Length <= index)
+            return null;
+
+        return m_TimeGameObject[index];
+    }
 
     [SerializeField] protected GameObject   PrefabGameSceneData             = null;
     [SerializeField] protected GameObject   m_BG                            = null;
@@ -50,14 +61,14 @@ public class CGameManager : MonoBehaviour
     //[SerializeField] protected GameObject   m_HistoryWindow     = null;
     // ==================== All ObjData  ===========================================
 
-    //protected CGameObjBasListData[]     m_AllGameObjBas     = new CGameObjBasListData[(int)CGameObjBas.EObjType.eMax];
-    //public CGameObjBasListData GetTypeGameObjBaseListData(CGameObjBas.EObjType type) { return m_AllGameObjBas[(int)type]; }
+    protected CGameObjBasListData[] m_AllGameObjBas = new CGameObjBasListData[(int)CGameObjBas.EObjType.eMax];
+    public CGameObjBasListData GetTypeGameObjBaseListData(CGameObjBas.EObjType type) { return m_AllGameObjBas[(int)type]; }
 
-    //protected CMovableBaseListData[]    m_AllMovableBase    = new CMovableBaseListData[(int)CMovableBase.EMovableType.eMax];
-    //public CMovableBaseListData GetTypeMovableBaseListData(CMovableBase.EMovableType type) { return m_AllMovableBase[(int)type]; }
+    protected CMovableBaseListData[] m_AllMovableBase = new CMovableBaseListData[(int)CMovableBase.EMovableType.eMax];
+    public CMovableBaseListData GetTypeMovableBaseListData(CMovableBase.EMovableType type) { return m_AllMovableBase[(int)type]; }
 
-    //protected CActorBaseListData[]      m_AllActorBase      = new CActorBaseListData[(int)CActor.EActorType.eMax];
-    //public CActorBaseListData GetTypeActorBaseListData(CActor.EActorType type) { return m_AllActorBase[(int)type]; }
+    protected CActorBaseListData[] m_AllActorBase = new CActorBaseListData[(int)CActor.EActorType.eMax];
+    public CActorBaseListData GetTypeActorBaseListData(CActor.EActorType type) { return m_AllActorBase[(int)type]; }
 
 
     // ==================== All ObjData ===========================================
@@ -108,7 +119,12 @@ public class CGameManager : MonoBehaviour
     protected PhysicsScene _scenePredictionPhysics;
     public PhysicsScene scenePredictionPhysics => _scenePredictionPhysics;
 
-    
+    protected bool m_OpenPhysics = true;
+    public bool OpenPhysics
+    {
+        set => m_OpenPhysics = value;
+        get => m_OpenPhysics;
+    }
 
     void Awake()
     {
@@ -141,18 +157,20 @@ public class CGameManager : MonoBehaviour
         _scenePrediction = SceneManager.CreateScene("ScenePredictPhysics", sceneParam);
         _scenePredictionPhysics = scenePrediction.GetPhysicsScene();
 
-        GameObject lTempBG = GameObject.Instantiate(m_BG);
-        SceneManager.MoveGameObjectToScene(lTempBG, scenePrediction);
-
+        if (m_BG != null)
+        {
+            GameObject lTempBG = GameObject.Instantiate(m_BG);
+            SceneManager.MoveGameObjectToScene(lTempBG, scenePrediction);
+        }
         //m_EndCinemachineTargetGroup = this.GetComponentInChildren<CinemachineTargetGroup>();
-        //for (int i = 0; i < m_AllGameObjBas.Length; i++)
-        //    m_AllGameObjBas[i] = new CGameObjBasListData();
+        for (int i = 0; i < m_AllGameObjBas.Length; i++)
+            m_AllGameObjBas[i] = new CGameObjBasListData();
 
-        //for (int i = 0; i < m_AllMovableBase.Length; i++)
-        //    m_AllMovableBase[i] = new CMovableBaseListData();
+        for (int i = 0; i < m_AllMovableBase.Length; i++)
+            m_AllMovableBase[i] = new CMovableBaseListData();
 
-        //for (int i = 0; i < m_AllActorBase.Length; i++)
-        //    m_AllActorBase[i] = new CActorBaseListData();
+        for (int i = 0; i < m_AllActorBase.Length; i++)
+            m_AllActorBase[i] = new CActorBaseListData();
 
 
         StaticGlobalDel.CreateSingletonObj(PrefabGameSceneData);
@@ -160,6 +178,8 @@ public class CGameManager : MonoBehaviour
         if (CurStageData.WinMoveWinPos)
             m_WinPosition = GameObject.Find("WinPos").transform;
 
+
+        Physics.gravity = CurStageData.Gravity;
         //for (int i = 0; i < MyTargetBuilding.BrickRandomLevelAllColor.Length; i++)
         //{
         //    m_DictionaryDataLevelAllColor.Add(MyTargetBuilding.BrickRandomLevelAllColor[i].ID, MyTargetBuilding.BrickRandomLevelAllColor[i]);
@@ -168,9 +188,9 @@ public class CGameManager : MonoBehaviour
         //        MyTargetBuilding.BrickRandomLevelAllColor[i].TotleColorRatio += Dcolor._Ratio;
         //}
 
-        CAudioManager lTempAudioManager = CAudioManager.SharedInstance;
-        lTempAudioManager.PlayBGM(CAudioManager.EBGM.eOutGame);
         m_Player = this.GetComponentInChildren<CPlayer>();
+
+        
     }
 
     // Start is called before the first frame update
@@ -227,50 +247,10 @@ public class CGameManager : MonoBehaviour
 
     private void FixedUpdate()
     {
-        _sceneMainPhysics.Simulate(Time.fixedDeltaTime);
+        if (m_OpenPhysics)
+            _sceneMainPhysics.Simulate(Time.fixedDeltaTime);
     }
-
-    //public void ShowPath(Vector3 AddForce, Rigidbody RefRigidbody)
-    //{
-    //    if (!_sceneMainPhysics.IsValid())
-    //        return;
-
-    //    GameObject predictionBall = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-    //    SceneManager.MoveGameObjectToScene(predictionBall, scenePrediction);
-    //    predictionBall.transform.position = RefRigidbody.gameObject.transform.position;
-    //    predictionBall.transform.rotation = RefRigidbody.gameObject.transform.rotation;
-    //    predictionBall.transform.localScale = Vector3.one * 3.0f;
-
-    //    Rigidbody lTempRigidbody = predictionBall.AddComponent<Rigidbody>();
-    //    lTempRigidbody.mass = RefRigidbody.mass;
-    //    lTempRigidbody.velocity = AddForce;
-
-    //    //m_MyPlayerMemoryShare.m_LinePath.positionCount = m_MyPlayerMemoryShare.m_BezierPath.Length;
-    //    //m_MyPlayerMemoryShare.m_LinePath.SetPositions(m_MyPlayerMemoryShare.m_BezierPath);
-    //    m_LinePath.positionCount = 0;
-
-    //    List<Vector3> lTempAllPathPoint = new List<Vector3>();
-    //    const float CmaxTime = 3.0f;
-    //    float lTempCutTime = 0.0f;
-
-    //  //  Debug.Log($"==============================================");
-    //    while (lTempCutTime < CmaxTime)
-    //    {
-    //        _scenePredictionPhysics.Simulate(Time.fixedDeltaTime * 4.0f);
-    //        lTempCutTime += Time.fixedDeltaTime * 4.0f;
-
-    //      //  Debug.Log($"predictionBall.transform.position = {predictionBall.transform.position}");
-    //        lTempAllPathPoint.Add(predictionBall.transform.position);
-           
-    //    }
-
-    //    m_LinePath.positionCount = lTempAllPathPoint.Count;
-    //    m_LinePath.SetPositions(lTempAllPathPoint.ToArray());
-
-    //    Destroy(predictionBall);
-    //}
-
-
+   
     public void SetState(EState lsetState)
     {
         if (lsetState == m_eCurState)
@@ -308,6 +288,14 @@ public class CGameManager : MonoBehaviour
                 break;
             case EState.eWinUI:
                 {
+                    if (SceneManager.GetActiveScene().buildIndex == 4)
+                    {
+                        CActorBaseListData lTempCActorBaseListData = GetTypeActorBaseListData(CActor.EActorType.eNPC);
+
+                        foreach (var item in lTempCActorBaseListData.m_ActorBaseListData)
+                            item.SetChangState( CMovableStatePototype.EMovableState.eWin);
+
+                    }
 
                     m_MyResultUI.ShowSuccessUI(0.5f);
                 }
@@ -356,11 +344,13 @@ public class CGameManager : MonoBehaviour
 
     public void OnNext()
     {
+        DOTween.KillAll();
         m_ChangeScenes.LoadGameScenes();
     }
 
     public void OnReset()
     {
+        DOTween.KillAll();
         m_ChangeScenes.ResetScene();
     }
 
@@ -369,93 +359,93 @@ public class CGameManager : MonoBehaviour
     //public void SetWinUI()
     //{
     //    SetState(EState.eWinUI);
-       
+
     //}
 
     //public void SetLoseUI()
     //{
     //    SetState(EState.eGameOver);
     //}
-    
+
 
     // ==================== All ObjData  ===========================================
 
-    //public void AddGameObjBasListData(CGameObjBas addGameObjBas)
-    //{
-    //    if (isApplicationQuitting)
-    //        return;
+    public void AddGameObjBasListData(CGameObjBas addGameObjBas)
+    {
+        if (isApplicationQuitting)
+            return;
 
-    //    if (addGameObjBas == null)
-    //        return;
+        if (addGameObjBas == null)
+            return;
 
-    //    int lTempTypeIndex = (int)addGameObjBas.ObjType();
+        int lTempTypeIndex = (int)addGameObjBas.ObjType();
 
-    //    addGameObjBas.GameObjBasIndex = m_AllGameObjBas[lTempTypeIndex].m_GameObjBasListData.Count;
-    //    m_AllGameObjBas[lTempTypeIndex].m_GameObjBasListData.Add(addGameObjBas);
-    //    m_AllGameObjBas[lTempTypeIndex].m_GameObjBasHashtable.Add(addGameObjBas.GetInstanceID(), addGameObjBas);
-    //}
+        addGameObjBas.GameObjBasIndex = m_AllGameObjBas[lTempTypeIndex].m_GameObjBasListData.Count;
+        m_AllGameObjBas[lTempTypeIndex].m_GameObjBasListData.Add(addGameObjBas);
+        m_AllGameObjBas[lTempTypeIndex].m_GameObjBasHashtable.Add(addGameObjBas.GetInstanceID(), addGameObjBas);
+    }
 
-    //public void RemoveGameObjBasListData(CGameObjBas addGameObjBas)
-    //{
-    //    if (isApplicationQuitting)
-    //        return;
+    public void RemoveGameObjBasListData(CGameObjBas addGameObjBas)
+    {
+        if (isApplicationQuitting)
+            return;
 
-    //    if (addGameObjBas == null)
-    //        return;
+        if (addGameObjBas == null)
+            return;
 
-    //    int lTempTypeIndex = (int)addGameObjBas.ObjType();
-    //    List<CGameObjBas> lTempGameObjBasList = m_AllGameObjBas[lTempTypeIndex].m_GameObjBasListData;
+        int lTempTypeIndex = (int)addGameObjBas.ObjType();
+        List<CGameObjBas> lTempGameObjBasList = m_AllGameObjBas[lTempTypeIndex].m_GameObjBasListData;
 
-    //    lTempGameObjBasList.Remove(addGameObjBas);
-    //    for (int i = 0; i < lTempGameObjBasList.Count; i++)
-    //        lTempGameObjBasList[i].GameObjBasIndex = i;
+        lTempGameObjBasList.Remove(addGameObjBas);
+        for (int i = 0; i < lTempGameObjBasList.Count; i++)
+            lTempGameObjBasList[i].GameObjBasIndex = i;
 
-    //    m_AllGameObjBas[lTempTypeIndex].m_GameObjBasHashtable.Remove(addGameObjBas.GetInstanceID());
-    //}
+        m_AllGameObjBas[lTempTypeIndex].m_GameObjBasHashtable.Remove(addGameObjBas.GetInstanceID());
+    }
 
-    //public void AddMovableBaseListData(CMovableBase addMovableBase)
-    //{
-    //    if (addMovableBase == null)
-    //        return;
+    public void AddMovableBaseListData(CMovableBase addMovableBase)
+    {
+        if (addMovableBase == null)
+            return;
 
-    //    int lTempTypeIndex = (int)addMovableBase.MyMovableType();
-    //    m_AllMovableBase[lTempTypeIndex].m_MovableBaseListData.Add(addMovableBase);
-    //}
+        int lTempTypeIndex = (int)addMovableBase.MyMovableType();
+        m_AllMovableBase[lTempTypeIndex].m_MovableBaseListData.Add(addMovableBase);
+    }
 
-    //public void RemoveMovableBaseListData(CMovableBase removeMovableBase)
-    //{
-    //    if (isApplicationQuitting)
-    //        return;
+    public void RemoveMovableBaseListData(CMovableBase removeMovableBase)
+    {
+        if (isApplicationQuitting)
+            return;
 
-    //    if (removeMovableBase == null)
-    //        return;
+        if (removeMovableBase == null)
+            return;
 
-    //    int lTempTypeIndex = (int)removeMovableBase.MyMovableType();
-    //    List<CMovableBase> lTempMovableBaseList = m_AllMovableBase[lTempTypeIndex].m_MovableBaseListData;
-    //    lTempMovableBaseList.Remove(removeMovableBase);
-    //}
+        int lTempTypeIndex = (int)removeMovableBase.MyMovableType();
+        List<CMovableBase> lTempMovableBaseList = m_AllMovableBase[lTempTypeIndex].m_MovableBaseListData;
+        lTempMovableBaseList.Remove(removeMovableBase);
+    }
 
-    //public void AddActorBaseListData(CActor addActorBase)
-    //{
-    //    if (addActorBase == null)
-    //        return;
+    public void AddActorBaseListData(CActor addActorBase)
+    {
+        if (addActorBase == null)
+            return;
 
-    //    int lTempTypeIndex = (int)addActorBase.MyActorType();
-    //    m_AllActorBase[lTempTypeIndex].m_ActorBaseListData.Add(addActorBase);
-    //}
+        int lTempTypeIndex = (int)addActorBase.MyActorType();
+        m_AllActorBase[lTempTypeIndex].m_ActorBaseListData.Add(addActorBase);
+    }
 
-    //public void RemoveActorBaseListData(CActor removeActorBase)
-    //{
-    //    if (isApplicationQuitting)
-    //        return;
+    public void RemoveActorBaseListData(CActor removeActorBase)
+    {
+        if (isApplicationQuitting)
+            return;
 
-    //    if (removeActorBase == null)
-    //        return;
+        if (removeActorBase == null)
+            return;
 
-    //    int lTempTypeIndex = (int)removeActorBase.MyActorType();
-    //    List<CActor> lTempActorBaseList = m_AllActorBase[lTempTypeIndex].m_ActorBaseListData;
-    //    lTempActorBaseList.Remove(removeActorBase);
-    //}
+        int lTempTypeIndex = (int)removeActorBase.MyActorType();
+        List<CActor> lTempActorBaseList = m_AllActorBase[lTempTypeIndex].m_ActorBaseListData;
+        lTempActorBaseList.Remove(removeActorBase);
+    }
 
     // ==================== All ObjData  ===========================================
 }

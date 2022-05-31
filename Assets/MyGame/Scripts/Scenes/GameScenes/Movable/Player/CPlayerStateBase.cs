@@ -43,5 +43,5 @@ public abstract class CPlayerStateBase : CMovableStatePototype
 
 
 
-    
+
 }

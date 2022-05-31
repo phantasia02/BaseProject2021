@@ -4,11 +4,19 @@ using UnityEngine;
 
 public delegate CMovableBuffPototype DelCreateBuff();
 
+
+public class DataAddBuffInfo
+{
+    public List<int> m_ListDataIndex = new List<int>();
+    public string m_Text = "";
+}
+
 public abstract class CMovableBuffPototype : CExternalOBJBase
 {
     public enum EMovableBuff
     {
-        eSurpris = 0,
+        eSurpris    = 0,
+        eExpression = 1,
         eMax
     }
     abstract public EMovableBuff BuffType();
@@ -34,9 +42,9 @@ public abstract class CMovableBuffPototype : CExternalOBJBase
         m_OldBuffCount          = m_CurCount        = 0;
     }
 
-    public void InMovableState()
+    public void InMovableState(DataAddBuffInfo data = null)
     {
-        AddBuff();
+        AddBuff(data);
         ClearTime();
     }
 
@@ -69,7 +77,7 @@ public abstract class CMovableBuffPototype : CExternalOBJBase
     public bool MomentinTime(float time) { return m_OldBuffTime < time && m_CurTime >= time; }
 
 
-    protected virtual void AddBuff() { }
+    protected virtual void AddBuff(DataAddBuffInfo data) { }
 
     protected virtual void updataState() { }
 

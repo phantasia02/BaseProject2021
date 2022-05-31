@@ -50,10 +50,9 @@ public abstract class CMovableBase : CGameObjBas
 
     public enum EMovableType
     {
-        eNull               = 0,
+        eActor              = 0,
         ePlayer             = 1,
-        eActor              = 2,
-    
+        eBullet             = 2,
         eMax
     };
 
@@ -178,7 +177,9 @@ public abstract class CMovableBase : CGameObjBas
 
     protected virtual void CreateMemoryShare()
     {
-        //m_MyMemoryShare = new CMemoryShareBase();
+        if (m_MyMemoryShare == null)
+            m_MyMemoryShare = new CMemoryShareBase();
+
         SetBaseMemoryShare();
     }
 
@@ -189,8 +190,10 @@ public abstract class CMovableBase : CGameObjBas
 
     protected void SetBaseMemoryShare()
     {
+        if (m_MyMemoryShare.m_MyMovable == null)
+            m_MyMemoryShare.m_MyMovable             = this;
+
         m_MyMemoryShare.m_MyTransform           = this.transform;
-        m_MyMemoryShare.m_MyMovable             = this;
 
         m_MyMemoryShare.m_MyRigidbody           = this.GetComponent<Rigidbody>();
         m_MyMemoryShare.m_MyAllCollider         = m_MyAllCollider;
@@ -262,12 +265,13 @@ public abstract class CMovableBase : CGameObjBas
     // Start is called before the first frame update
     protected override void Start()
     {
-        
         base.Start();
+        m_MyGameManager.AddMovableBaseListData(this);
     }
 
     protected override void OnDestroy()
     {
+        m_MyGameManager.RemoveMovableBaseListData(this);
         base.OnDestroy();
     }
 
@@ -374,20 +378,20 @@ public abstract class CMovableBase : CGameObjBas
         }
     }
 
-    public virtual void AddBuff(CMovableBuffPototype.EMovableBuff pamAddBuff)
+    public virtual void AddBuff(CMovableBuffPototype.EMovableBuff pamAddBuff, DataAddBuffInfo data = null)
     {
         foreach (CMovableBuffPototype CAB in m_CurAllBuff)
         {
             if (CAB.BuffType() == pamAddBuff)
                 return;
         }
-
+        
         CMovableBuffPototype lTempCreaterBuff = m_AllCreateList[(int)pamAddBuff]();
         if (lTempCreaterBuff == null)
             return;
 
-        lTempCreaterBuff.InMovableState();
         m_CurAllBuff.Add(lTempCreaterBuff);
+        lTempCreaterBuff.InMovableState(data);
     }
 
     public virtual void RemoveBuff(CMovableBuffPototype pamremoveBuff)
@@ -527,7 +531,6 @@ public abstract class CMovableBase : CGameObjBas
             UpdateCurSpeed();
     }
 
-
     public void AllColliderEnabled(bool enabled)
     {
         if (m_MyMemoryShare.m_MyAllCollider != null)
@@ -538,6 +541,24 @@ public abstract class CMovableBase : CGameObjBas
                     item.enabled = enabled;
             }
         }
+    }
+
+    public void UseGravityRigidbody(bool useGravity)
+    {
+        if (m_MyMemoryShare.m_MyRigidbody == null)
+            return;
+
+        m_MyMemoryShare.m_MyRigidbody.useGravity = useGravity;
+        m_MyMemoryShare.m_MyRigidbody.isKinematic = !useGravity;
+    }
+
+    public void UseTirgger(bool setuseTirgger)
+    {
+        if (m_MyMemoryShare.m_MyAllCollider == null)
+            return;
+
+        foreach (var item in m_MyMemoryShare.m_MyAllCollider)
+            item.isTrigger = setuseTirgger;
     }
 
     // ===================== UniRx ======================

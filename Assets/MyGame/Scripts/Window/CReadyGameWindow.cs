@@ -32,6 +32,14 @@ public class CReadyGameWindow : CSingletonMonoBehaviour<CReadyGameWindow>
     // Start is called before the first frame update
     void Start()
     {
+
+    }
+
+
+    public void ShowWindowUI()
+    {
+        m_ShowObj.SetActive(true);
+
         CSaveManager lTempCSaveManager = CSaveManager.SharedInstance;
         if (lTempCSaveManager)
         {
@@ -39,11 +47,6 @@ public class CReadyGameWindow : CSingletonMonoBehaviour<CReadyGameWindow>
             m_CurLevel.SetText(lTempstring);
             m_CurLevelShowdo.SetText(lTempstring);
         }
-    }
-
-    public void ShowWindowUI()
-    {
-        m_ShowObj.SetActive(true);
     }
 
     public bool GetShow() { return m_ShowObj.activeSelf; }

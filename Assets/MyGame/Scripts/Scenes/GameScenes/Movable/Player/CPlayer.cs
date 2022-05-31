@@ -5,17 +5,18 @@ using Cinemachine;
 using DG.Tweening;
 using UniRx;
 using MYgame.Scripts.Scenes.GameScenes.Data;
+using UnityEngine.SceneManagement;
+using System;
 
+//interface IProduct
+//{
+//    int aaa;
+//    string model { get; set; }//宣告 model這個屬性需有 get 與 set 兩個方法
+//    decimal price { get; set; }
 
-public class DataPathNode
-{
-    public DataPathNode(Vector3 pos)
-    {
-        m_Postion = pos;
-    }
+//    decimal Tax();
+//}
 
-    public Vector3 m_Postion = Vector3.zero;
-}
 
 /// <summary>
 /// Player Memory Share Data
@@ -45,14 +46,8 @@ public class CPlayerMemoryShare : CMemoryShareBase
     public Vector3                              m_HitWaterPoint             = Vector3.zero;
     public Transform                            m_AllObj                    = null;
 
-
-
     public CDataAllSkill                        m_AllSkill                  = new CDataAllSkill();
     public UniRx.Subject<UniRx.Unit>            m_FritPlay                  = new UniRx.Subject<UniRx.Unit>();
-
-    public LineRenderer                         m_LinePath                  = null;
-    public List<GameObject>                     m_PlayerListRenderObj       = null;
-    public List<GameObject>                     m_TargetListRenderObj       = null;
 };
 
 /// <summary>
@@ -61,7 +56,6 @@ public class CPlayerMemoryShare : CMemoryShareBase
 public class CPlayer : CMovableBase
 {
     public override EMovableType MyMovableType() { return EMovableType.ePlayer; }
-    public override EObjType ObjType() { return EObjType.ePlayer; }
 
     protected float m_MaxMoveDirSize = 5.0f;
     public float MaxMoveDirSize => m_MaxMoveDirSize;
@@ -114,33 +108,18 @@ public class CPlayer : CMovableBase
 
     protected override void AddInitState()
     {
-        m_AllState[(int)StaticGlobalDel.EMovableState.eWait].AllThisState.Add(new CWaitStatePlayer(this));
-        m_AllState[(int)StaticGlobalDel.EMovableState.eWait].AllThisState.Add(new CReadyPlayStatePlayer(this));
-
-
-        m_AllState[(int)StaticGlobalDel.EMovableState.eDrag].AllThisState.Add(new CDragStatePlayer(this));
-        m_AllState[(int)StaticGlobalDel.EMovableState.eJump].AllThisState.Add(new CJumpStatePlayer(this));
-
-
-        if (m_MyGameManager.CurStageData.WinMoveWinPos)
-            m_AllState[(int)StaticGlobalDel.EMovableState.eWin].AllThisState.Add(new CWinStatePlayer(this));
-        else
-            m_AllState[(int)StaticGlobalDel.EMovableState.eWin].AllThisState.Add(new CWinNoPosStatePlayer(this));
-
-        m_AllState[(int)StaticGlobalDel.EMovableState.eDeath].AllThisState.Add(new CDeathStatePlayer(this));
     }
 
     protected override void CreateMemoryShare()
     {
-        m_MyPlayerMemoryShare = new CPlayerMemoryShare();
-        m_MyMemoryShare = m_MyPlayerMemoryShare;
+        if (m_MyMemoryShare == null)
+            m_MyMemoryShare = m_MyPlayerMemoryShare = new CPlayerMemoryShare();
 
-        m_MyPlayerMemoryShare.m_MyPlayer = this;
+        if (m_MyMemoryShare.m_MyMovable == null)
+            m_MyMemoryShare.m_MyMovable = m_MyPlayerMemoryShare.m_MyPlayer = this;
+
         m_MyPlayerMemoryShare.m_CurStageData        = m_MyGameManager.CurStageData;
-        m_MyPlayerMemoryShare.m_LinePath            = this.GetComponentInChildren<LineRenderer>();
         m_MyPlayerMemoryShare.m_AllObj              = this.transform.Find("AllObj");
-        m_MyPlayerMemoryShare.m_PlayerListRenderObj = m_PlayerListRenderObj;
-        m_MyPlayerMemoryShare.m_TargetListRenderObj = m_TargetListRenderObj;
 
         base.CreateMemoryShare();
 
@@ -161,11 +140,6 @@ public class CPlayer : CMovableBase
     {
         base.Start();
 
-
-        //UpdateAnimationVal().Subscribe(_ => {
-        //    UpdateAnimationChangVal();
-        //}).AddTo(this.gameObject);
-
 #if DEBUGPC
 
 #endif
@@ -174,13 +148,12 @@ public class CPlayer : CMovableBase
 
     public void InitGameStart()
     {
-        //CGameSceneWindow lTempCGameSceneWindow = CGameSceneWindow.SharedInstance;
-        //lTempCGameSceneWindow.SetData(m_MyPlayerMemoryShare.m_AllArchitecturalTopics, false);
+
     }
 
     public void UpdateAnimationChangVal()
     {
-       // if (m_MyPlayerMemoryShare.m_isupdateAnimation)
+
     }
 
     protected override void Update()
@@ -207,21 +180,21 @@ public class CPlayer : CMovableBase
                 return;
         }
 #endif
-
         if ((int)m_MyGameManager.CurState < (int)CGameManager.EState.ePlay)
             return;
+
 
         //if (Input.GetMouseButtonDown(0))
         //{
         //    PlayerMouseDown();
         //}
-
         if (Input.GetMouseButtonUp(0))
         {
             PlayerMouseUp();
         }
         else if (Input.GetMouseButton(0))
         {
+            
             PlayerMouseDrag();
         }
     }
@@ -231,39 +204,45 @@ public class CPlayer : CMovableBase
     //    DataState lTempDataState = m_AllState[(int)CurState];
     //    if (m_CurState != CMovableStatePototype.EMovableState.eNull && lTempDataState != null && lTempDataState.AllThisState[lTempDataState.index] != null)
     //        lTempDataState.AllThisState[lTempDataState.index].MouseDown();
-
-    //    if (!m_MyPlayerMemoryShare.m_bDown)
-    //    {
-    //        m_MyPlayerMemoryShare.m_bDown = true;
-    //        m_MyPlayerMemoryShare.m_OldMouseDownPos = Input.mousePosition;
-    //        m_MyPlayerMemoryShare.m_DownMouseDownPos = Input.mousePosition;
-    //        m_MyPlayerMemoryShare.m_DownTime = Time.realtimeSinceStartup;
-    //    }
     //}
 
-    public override void OnMouseDown()
+    //public override void OnMouseDown()
+    //{
+    //    //DataState lTempDataState = m_AllState[(int)CurState];
+    //    //if (m_CurState != CMovableStatePototype.EMovableState.eNull && lTempDataState != null && lTempDataState.AllThisState[lTempDataState.index] != null)
+    //    //    lTempDataState.AllThisState[lTempDataState.index].MouseDown();
+
+    //    base.OnMouseDown();
+
+    //    if (!m_MyPlayerMemoryShare.m_bDown)
+    //        SaveMouseDown();
+    //}
+
+    public bool RayInputTest()
     {
-        //DataState lTempDataState = m_AllState[(int)CurState];
-        //if (m_CurState != CMovableStatePototype.EMovableState.eNull && lTempDataState != null && lTempDataState.AllThisState[lTempDataState.index] != null)
-        //    lTempDataState.AllThisState[lTempDataState.index].MouseDown();
-
-        base.OnMouseDown();
-
-        if (!m_MyPlayerMemoryShare.m_bDown)
+        if (Input.GetMouseButtonDown(0))
         {
-            m_MyPlayerMemoryShare.m_bDown = true;
-            m_MyPlayerMemoryShare.m_OldMouseDownPos = Input.mousePosition;
-            m_MyPlayerMemoryShare.m_DownMouseDownPos = Input.mousePosition;
-            m_MyPlayerMemoryShare.m_DownTime = Time.realtimeSinceStartup;
+            bool ltemp = Physics.Raycast(Camera.main.ViewportPointToRay(new Vector3(Input.mousePosition.x /Screen.width, Input.mousePosition.y / Screen.height)), 
+                out RaycastHit m_RaycastHitInfo, 100.0f, StaticGlobalDel.g_PlayerMask | StaticGlobalDel.g_eRenderFlashModelShowMask);
+
+            return ltemp;
         }
 
+        return false;
+    }
+
+    public void SaveMouseDown()
+    {
+        m_MyPlayerMemoryShare.m_bDown = true;
+        m_MyPlayerMemoryShare.m_OldMouseDownPos = Input.mousePosition;
+        m_MyPlayerMemoryShare.m_DownMouseDownPos = Input.mousePosition;
+        m_MyPlayerMemoryShare.m_DownTime = Time.realtimeSinceStartup;
     }
 
     public void PlayerMouseDrag()
     {
         //if (!m_MyPlayerMemoryShare.m_bDown)
         //    return;
-
         m_MyPlayerMemoryShare.m_CurMouseDownPos = Input.mousePosition;
 
         DataState lTempDataState = m_AllState[(int)CurState];
@@ -298,6 +277,7 @@ public class CPlayer : CMovableBase
 
     public void PlayEnd()
     {
+        SetChangState(CMovableStatePototype.EMovableState.eJump);
         ObserverPlayEndEvent().OnNext(UniRx.Unit.Default);
     }
 
@@ -321,11 +301,6 @@ public class CPlayer : CMovableBase
     public UniRx.Subject<UniRx.Unit> ObserverPlayEndEvent()
     {
         return m_PlayEndEvent ?? (m_PlayEndEvent = new UniRx.Subject<UniRx.Unit>());
-    }
-
-    public UniRx.Subject<UniRx.Unit> ObserverFritPlay()
-    {
-        return m_MyPlayerMemoryShare.m_FritPlay ?? (m_MyPlayerMemoryShare.m_FritPlay = new UniRx.Subject<UniRx.Unit>());
     }
 
     // ===================== UniRx ======================
