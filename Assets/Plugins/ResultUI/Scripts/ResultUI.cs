@@ -56,4 +56,10 @@ public class ResultUI : MonoBehaviour
         _animator.enabled = true;
         _animator.SetBool(_successAnimParam, false);
     }
+
+    public void DeactivateUI()
+    {
+        _animator.Rebind();
+        _animator.enabled = false;
+    }
 }

@@ -49,7 +49,7 @@ public class CGGameSceneData : CSingletonMonoBehaviour<CGGameSceneData>
         eScared     = 0,
         eHappy      = 1,
         eBullet     = 2,
-        eRubberBand = 3,
+        eBulletDart = 3,
         eMax,
     };
 
@@ -62,6 +62,7 @@ public class CGGameSceneData : CSingletonMonoBehaviour<CGGameSceneData>
     public enum EUIPrefab
     {
         eReadyGameWindow    = 0,
+        eResultWindow       = 1,
         eMax,
     };
 
@@ -87,6 +88,7 @@ public class CGGameSceneData : CSingletonMonoBehaviour<CGGameSceneData>
 
     [VarRename(CGGameSceneData.EOtherObj.eMax)]
     [SerializeField]  public    GameObject[]                m_AllOtherObj               = null;
+    [VarRename(CGGameSceneData.EUIPrefab.eMax)]
     [SerializeField]  public    GameObject[]                m_UIObj                     = null;
     [SerializeField]  public    Sprite[]                    m_AllExpressionSprite          = null;
 

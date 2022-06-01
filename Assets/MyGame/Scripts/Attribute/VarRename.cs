@@ -60,6 +60,15 @@ public class VarRename : PropertyAttribute
             g_StrList[i] = ((CSEPlayObj.EUpdateFuncType)i).ToString();
     }
 
+    public VarRename(CGGameSceneData.EUIPrefab UpdateUIPrefabEnumMax)
+    {
+        Init();
+        int lTempCount = (int)UpdateUIPrefabEnumMax;
+        g_StrList = new string[lTempCount];
+        for (int i = 0; i < lTempCount; i++)
+            g_StrList[i] = ((CGGameSceneData.EUIPrefab)i).ToString();
+    }
+
     private void Init()
     {
         g_VarName = "";

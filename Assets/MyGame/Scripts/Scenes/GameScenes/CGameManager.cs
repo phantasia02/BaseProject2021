@@ -112,12 +112,12 @@ public class CGameManager : MonoBehaviour
     protected Transform m_WinPosition = null;
     public Transform WinPosition => m_WinPosition;
 
-    protected Scene sceneMain;
-    protected Scene _scenePrediction;
-    public Scene scenePrediction => _scenePrediction;
-    protected PhysicsScene _sceneMainPhysics;
-    protected PhysicsScene _scenePredictionPhysics;
-    public PhysicsScene scenePredictionPhysics => _scenePredictionPhysics;
+    //protected Scene sceneMain;
+    //protected Scene _scenePrediction;
+    //public Scene scenePrediction => _scenePrediction;
+    //protected PhysicsScene _sceneMainPhysics;
+    //protected PhysicsScene _scenePredictionPhysics;
+    //public PhysicsScene scenePredictionPhysics => _scenePredictionPhysics;
 
     protected bool m_OpenPhysics = true;
     public bool OpenPhysics
@@ -132,36 +132,27 @@ public class CGameManager : MonoBehaviour
         const float HWRatioPototype = StaticGlobalDel.g_fcbaseHeight / StaticGlobalDel.g_fcbaseWidth;
         float lTempNewHWRatio = ((float)Screen.height / (float)Screen.width);
         m_HalfScreenWidth = (StaticGlobalDel.g_fcbaseWidth / 2.0f) * (lTempNewHWRatio / HWRatioPototype);
-        m_StartPosition = GameObject.Find("StartPosition").transform;
+       // m_StartPosition = GameObject.Find("StartPosition").transform;
 
-
-
-        m_MyResultUI = gameObject.GetComponentInChildren<ResultUI>(true);
-
-        if (m_MyResultUI != null)
-        {
-            m_MyResultUI.Over.onClick.AddListener(OnReset);
-            m_MyResultUI.Next.onClick.AddListener(OnNext);
-
-        }
 
         GameObject lTempCameraObj = GameObject.FindGameObjectWithTag("MainCamera");
         if (lTempCameraObj != null)
             m_Camera = lTempCameraObj.GetComponent<Camera>();
 
-        Physics.autoSimulation = false;
-        sceneMain = SceneManager.GetActiveScene();
-        _sceneMainPhysics = sceneMain.GetPhysicsScene();
+        //Physics.autoSimulation = false;
+        //sceneMain = SceneManager.GetActiveScene();
+        //_sceneMainPhysics = sceneMain.GetPhysicsScene();
 
-        CreateSceneParameters sceneParam = new CreateSceneParameters(LocalPhysicsMode.Physics3D);
-        _scenePrediction = SceneManager.CreateScene("ScenePredictPhysics", sceneParam);
-        _scenePredictionPhysics = scenePrediction.GetPhysicsScene();
+        //CreateSceneParameters sceneParam = new CreateSceneParameters(LocalPhysicsMode.Physics3D);
+        //_scenePrediction = SceneManager.CreateScene("ScenePredictPhysics", sceneParam);
+        //_scenePredictionPhysics = scenePrediction.GetPhysicsScene();
 
-        if (m_BG != null)
-        {
-            GameObject lTempBG = GameObject.Instantiate(m_BG);
-            SceneManager.MoveGameObjectToScene(lTempBG, scenePrediction);
-        }
+        //if (m_BG != null)
+        //{
+        //    GameObject lTempBG = GameObject.Instantiate(m_BG);
+        //    SceneManager.MoveGameObjectToScene(lTempBG, scenePrediction);
+        //}
+
         //m_EndCinemachineTargetGroup = this.GetComponentInChildren<CinemachineTargetGroup>();
         for (int i = 0; i < m_AllGameObjBas.Length; i++)
             m_AllGameObjBas[i] = new CGameObjBasListData();
@@ -189,8 +180,14 @@ public class CGameManager : MonoBehaviour
         //}
 
         m_Player = this.GetComponentInChildren<CPlayer>();
+        m_MyResultUI = GameObject.FindObjectOfType<ResultUI>();
+        if (m_MyResultUI != null)
+        {
+            m_MyResultUI.Over.onClick.AddListener(OnReset);
+            m_MyResultUI.Next.onClick.AddListener(OnNext);
+        }
 
-        
+        StaticGlobalDel.fixedDeltaTime = Time.fixedDeltaTime;
     }
 
     // Start is called before the first frame update
@@ -221,36 +218,15 @@ public class CGameManager : MonoBehaviour
                 }
             }).AddTo(this);
 
-        //Observable.EveryUpdate().First(_ => Input.GetMouseButtonDown(0)).Subscribe(
-        //OnNext =>
-        //{
-        //    if (m_eCurState == EState.eReady)
-        //    {
-        //        SetState(EState.ePlay);
-
-        //        CReadyGameWindow lTempCReadyGameWindow = CReadyGameWindow.SharedInstance;
-        //        if (lTempCReadyGameWindow && lTempCReadyGameWindow.GetShow())
-        //            lTempCReadyGameWindow.CloseShowUI();
-
-        //        CGameSceneWindow lTempGameSceneWindow = CGameSceneWindow.SharedInstance;
-        //        if (lTempGameSceneWindow)
-        //        {
-
-        //        }
-        //    }
-        //},
-        //OnCompleted => { Debug.Log("OK"); }
-        //).AddTo(this);
-
        // SetState(EState.ePlay);
     }
 
-    private void FixedUpdate()
-    {
-        if (m_OpenPhysics)
-            _sceneMainPhysics.Simulate(Time.fixedDeltaTime);
-    }
-   
+    //private void FixedUpdate()
+    //{
+    //    if (m_OpenPhysics)
+    //        _sceneMainPhysics.Simulate(Time.fixedDeltaTime);
+    //}
+
     public void SetState(EState lsetState)
     {
         if (lsetState == m_eCurState)
@@ -344,28 +320,25 @@ public class CGameManager : MonoBehaviour
 
     public void OnNext()
     {
-        DOTween.KillAll();
         m_ChangeScenes.LoadGameScenes();
     }
 
     public void OnReset()
     {
-        DOTween.KillAll();
         m_ChangeScenes.ResetScene();
+    }
+
+    public void OnDestroy()
+    {
+        DOTween.KillAll();
+
+        if (m_MyResultUI != null)
+            m_MyResultUI.DeactivateUI();
     }
 
     void OnApplicationQuit() { isApplicationQuitting = true; }
 
-    //public void SetWinUI()
-    //{
-    //    SetState(EState.eWinUI);
 
-    //}
-
-    //public void SetLoseUI()
-    //{
-    //    SetState(EState.eGameOver);
-    //}
 
 
     // ==================== All ObjData  ===========================================
@@ -445,6 +418,18 @@ public class CGameManager : MonoBehaviour
         int lTempTypeIndex = (int)removeActorBase.MyActorType();
         List<CActor> lTempActorBaseList = m_AllActorBase[lTempTypeIndex].m_ActorBaseListData;
         lTempActorBaseList.Remove(removeActorBase);
+    }
+
+
+    public void SetAllActorTypeState(CActor.EActorType type, CMovableStatePototype.EMovableState state, int Stateindex = -1)
+    {
+        int index = (int)type;
+
+        if (m_AllActorBase.Length <= index)
+            return;
+
+        foreach (var item in m_AllActorBase[index].m_ActorBaseListData)
+            item.SetChangState(state, Stateindex);
     }
 
     // ==================== All ObjData  ===========================================

@@ -13,5 +13,9 @@ MonoBehaviour:
   m_Name: Stage_002
   m_EditorClassIdentifier: 
   _WinMoveWinPos: 0
+  _Gravity: {x: 0, y: -9.81, z: 0}
   _AddForce: {x: 3, y: 10, z: 10}
   _PredictionTime: 0.5
+  _PredictionBallSize: 1
+  _JumpStatePlayerType: 0
+  _RotationAngle: -20

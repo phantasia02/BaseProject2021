@@ -68,6 +68,7 @@ public static class StaticGlobalDel
     public const string TagSaveManager      = "SaveManager";
     public const string TagAudioManager     = "AudioManager";
     public const string TagReadyGameWindow  = "ReadyGameWindow";
+    public const string TagResultWindow     = "ResultWindow";
     public const string TagWin              = "WinTag";
     public const string TagPlayTouchObject  = "PlayTouchObject";
     public const string TagJumpBounce       = "Bounce";
@@ -95,6 +96,13 @@ public static class StaticGlobalDel
     public const float  g_TUA                           = Mathf.PI * 2.0f;
     // ============= Speed ====================
     public const float g_DefMovableTotleSpeed = 15.0f;
+
+    static float g_fixedDeltaTime = 0.02f;
+    public static float fixedDeltaTime
+    {
+        get => g_fixedDeltaTime;
+        set => g_fixedDeltaTime = value;
+    }
 
     static int g_DoTweenID = 1;
     public static int GetDoTweenID() { return g_DoTweenID++; }
@@ -146,6 +154,7 @@ public static class StaticGlobalDel
             TagSaveManager,
             TagAudioManager,
             TagReadyGameWindow,
+            TagResultWindow
         };
 
         CGGameSceneData lTempCGGameSceneData = null;
@@ -174,6 +183,9 @@ public static class StaticGlobalDel
                         break;
                     case TagReadyGameWindow:
                         lTempObj = GameObject.Instantiate(lTempCGGameSceneData.m_UIObj[(int)CGGameSceneData.EUIPrefab.eReadyGameWindow]);
+                        break;
+                    case TagResultWindow:
+                        lTempObj = GameObject.Instantiate(lTempCGGameSceneData.m_UIObj[(int)CGGameSceneData.EUIPrefab.eResultWindow]);
                         break;
                 }
 

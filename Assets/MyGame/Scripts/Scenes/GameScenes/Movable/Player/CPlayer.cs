@@ -48,6 +48,10 @@ public class CPlayerMemoryShare : CMemoryShareBase
 
     public CDataAllSkill                        m_AllSkill                  = new CDataAllSkill();
     public UniRx.Subject<UniRx.Unit>            m_FritPlay                  = new UniRx.Subject<UniRx.Unit>();
+
+    public LineRenderer                         m_LinePath                  = null;
+    public List<GameObject>                     m_PlayerListRenderObj       = null;
+    public List<GameObject>                     m_TargetListRenderObj       = null;
 };
 
 /// <summary>
@@ -108,6 +112,7 @@ public class CPlayer : CMovableBase
 
     protected override void AddInitState()
     {
+        int lTempCurbuildIndex = SceneManager.GetActiveScene().buildIndex;
     }
 
     protected override void CreateMemoryShare()
@@ -119,7 +124,10 @@ public class CPlayer : CMovableBase
             m_MyMemoryShare.m_MyMovable = m_MyPlayerMemoryShare.m_MyPlayer = this;
 
         m_MyPlayerMemoryShare.m_CurStageData        = m_MyGameManager.CurStageData;
+        m_MyPlayerMemoryShare.m_LinePath            = this.GetComponentInChildren<LineRenderer>();
         m_MyPlayerMemoryShare.m_AllObj              = this.transform.Find("AllObj");
+        m_MyPlayerMemoryShare.m_PlayerListRenderObj = m_PlayerListRenderObj;
+        m_MyPlayerMemoryShare.m_TargetListRenderObj = m_TargetListRenderObj;
 
         base.CreateMemoryShare();
 
@@ -140,20 +148,28 @@ public class CPlayer : CMovableBase
     {
         base.Start();
 
+
+        //UpdateAnimationVal().Subscribe(_ => {
+        //    UpdateAnimationChangVal();
+        //}).AddTo(this.gameObject);
+
 #if DEBUGPC
 
 #endif
+
+
 
     }
 
     public void InitGameStart()
     {
-
+        //CGameSceneWindow lTempCGameSceneWindow = CGameSceneWindow.SharedInstance;
+        //lTempCGameSceneWindow.SetData(m_MyPlayerMemoryShare.m_AllArchitecturalTopics, false);
     }
 
     public void UpdateAnimationChangVal()
     {
-
+       // if (m_MyPlayerMemoryShare.m_isupdateAnimation)
     }
 
     protected override void Update()
