@@ -96,6 +96,7 @@ public class CGGameSceneData : CSingletonMonoBehaviour<CGGameSceneData>
     [SerializeField]  public    GameObject                  m_PrefabEventSystem         = null;
     [SerializeField]  public    GameObject                  m_SaveManager               = null;
     [SerializeField]  public    GameObject                  m_AudioManager              = null;
+    [SerializeField]  public    GameObject                  m_GameObjBasManager         = null;
     
     private void Awake()
     {

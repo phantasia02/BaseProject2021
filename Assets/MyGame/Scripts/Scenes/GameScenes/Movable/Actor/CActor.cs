@@ -115,12 +115,12 @@ public abstract class CActor : CMovableBase
     protected override void Start()
     {
         base.Start();
-        m_MyGameManager.AddActorBaseListData(this);
+        m_GameObjBasManager.AddActorBaseListData(this);
     }
 
     protected override void OnDestroy()
     {
-        m_MyGameManager.RemoveActorBaseListData(this);
+        m_GameObjBasManager.RemoveActorBaseListData(this);
         base.OnDestroy();
     }
 

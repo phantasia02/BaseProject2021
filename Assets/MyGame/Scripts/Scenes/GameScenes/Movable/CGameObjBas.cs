@@ -27,6 +27,7 @@ public abstract class CGameObjBas : MonoBehaviour
     abstract public EObjType ObjType();
     protected Transform m_OriginalParent = null;
     protected CGameManager m_MyGameManager = null;
+    protected CGameObjBasManager m_GameObjBasManager = null;
 
     protected int m_GameObjBasIndex = -1;
     public int GameObjBasIndex
@@ -42,14 +43,17 @@ public abstract class CGameObjBas : MonoBehaviour
         if (m_MyGameManager == null)
             m_MyGameManager = GameObject.FindObjectOfType<CGameManager>();
 
+        
         m_OriginalParent = gameObject.transform.parent;
-       
     }
 
     // Start is called before the first frame update
     protected virtual void Start()
     {
-        m_MyGameManager.AddGameObjBasListData(this);
+        if (m_GameObjBasManager == null)
+            m_GameObjBasManager = CGameObjBasManager.SharedInstance;
+
+        m_GameObjBasManager.AddGameObjBasListData(this);
     }
 
     public virtual void Init()
@@ -70,6 +74,6 @@ public abstract class CGameObjBas : MonoBehaviour
 
     protected virtual void OnDestroy()
     {
-        m_MyGameManager.RemoveGameObjBasListData(this);
+        m_GameObjBasManager.RemoveGameObjBasListData(this);
     }
 }

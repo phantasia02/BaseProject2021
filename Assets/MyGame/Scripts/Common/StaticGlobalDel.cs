@@ -60,19 +60,14 @@ public static class StaticGlobalDel
     public const string g_ShowCurLevelNamePrefix    = "STAGE ";
     public const string g_HistorvWindowScenes       = "HistorvWindowScenes";
 
+    public const string TagGameSceneData        = "CGGameSceneData";
+    public const string TagEventSystem          = "EventSystem";
+    public const string TagSaveManager          = "SaveManager";
+    public const string TagAudioManager         = "AudioManager";
+    public const string TagGameObjBasManager    = "GameObjBasManager";
 
-    public const string TagBrickObj         = "BrickObj";
-    public const string TagPlayer           = "Player";
-    public const string TagEventSystem      = "EventSystem";
-    public const string TagGameSceneData    = "CGGameSceneData";
-    public const string TagSaveManager      = "SaveManager";
-    public const string TagAudioManager     = "AudioManager";
-    public const string TagReadyGameWindow  = "ReadyGameWindow";
-    public const string TagResultWindow     = "ResultWindow";
-    public const string TagWin              = "WinTag";
-    public const string TagPlayTouchObject  = "PlayTouchObject";
-    public const string TagJumpBounce       = "Bounce";
-    public const string TagInsert           = "Insert";
+    public const string TagReadyGameWindow      = "ReadyGameWindow";
+    public const string TagResultWindow         = "ResultWindow";
 
 
     public const int g_WaterMask                    = 1 << (int)ELayerIndex.eWater;
@@ -153,11 +148,11 @@ public static class StaticGlobalDel
             TagEventSystem,
             TagSaveManager,
             TagAudioManager,
+            TagGameObjBasManager,
             TagReadyGameWindow,
-            TagResultWindow
+            TagResultWindow,
         };
 
-        CGGameSceneData lTempCGGameSceneData = null;
         GameObject lTempObj = null;
 
         for (int i = 0; i < lTempAllGlobalObj.Length; i++)
@@ -170,23 +165,26 @@ public static class StaticGlobalDel
                 {
                     case TagGameSceneData:
                         lTempObj = GameObject.Instantiate(PrefabGameSceneData);
-                        lTempCGGameSceneData = CGGameSceneData.SharedInstance;
                         break;
                     case TagEventSystem:
-                        lTempObj = GameObject.Instantiate(lTempCGGameSceneData.m_PrefabEventSystem);
+                        lTempObj = GameObject.Instantiate(CGGameSceneData.SharedInstance.m_PrefabEventSystem);
                         break;
                     case TagSaveManager:
-                        lTempObj = GameObject.Instantiate(lTempCGGameSceneData.m_SaveManager);
+                        lTempObj = GameObject.Instantiate(CGGameSceneData.SharedInstance.m_SaveManager);
                         break;
                     case TagAudioManager:
-                        lTempObj = GameObject.Instantiate(lTempCGGameSceneData.m_AudioManager);
+                        lTempObj = GameObject.Instantiate(CGGameSceneData.SharedInstance.m_AudioManager);
+                        break;
+                    case TagGameObjBasManager:
+                        lTempObj = GameObject.Instantiate(CGGameSceneData.SharedInstance.m_GameObjBasManager);
                         break;
                     case TagReadyGameWindow:
-                        lTempObj = GameObject.Instantiate(lTempCGGameSceneData.m_UIObj[(int)CGGameSceneData.EUIPrefab.eReadyGameWindow]);
+                        lTempObj = GameObject.Instantiate(CGGameSceneData.SharedInstance.m_UIObj[(int)CGGameSceneData.EUIPrefab.eReadyGameWindow]);
                         break;
                     case TagResultWindow:
-                        lTempObj = GameObject.Instantiate(lTempCGGameSceneData.m_UIObj[(int)CGGameSceneData.EUIPrefab.eResultWindow]);
+                        lTempObj = GameObject.Instantiate(CGGameSceneData.SharedInstance.m_UIObj[(int)CGGameSceneData.EUIPrefab.eResultWindow]);
                         break;
+
                 }
 
                 Object.DontDestroyOnLoad(lTempObj);

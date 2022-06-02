@@ -60,13 +60,11 @@ MonoBehaviour:
   m_AllStageData:
   - {fileID: 11400000, guid: 79af1cb576a58b540b7d76a21b6fb7fd, type: 2}
   - {fileID: 11400000, guid: 8c5216833d7b76f439d37b4c42c7d98d, type: 2}
-  - {fileID: 11400000, guid: ac2a622ddecd6c34bb176658ccd3220e, type: 2}
-  - {fileID: 11400000, guid: 0c03634de5e36194182064d080e3a76c, type: 2}
-  - {fileID: 11400000, guid: 0c75f47c95b2cfa46934c07a98290e8e, type: 2}
-  - {fileID: 11400000, guid: 07470125e6cfaec42b50e2a5c195edac, type: 2}
   m_PrefabEventSystem: {fileID: 1792202897340608778, guid: e66c430660b85334ca70bd0fec000779,
     type: 3}
   m_SaveManager: {fileID: 1842041293832986182, guid: c70ec8a811342bd48815a2f11379fcda,
     type: 3}
   m_AudioManager: {fileID: 3287756920535608787, guid: dbe633d67f6e0bc45a49546c39ba8ad5,
+    type: 3}
+  m_GameObjBasManager: {fileID: 2625956322290736321, guid: 348a3b56a0bcf2a49bf87a31c00285c9,
     type: 3}

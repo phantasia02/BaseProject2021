@@ -266,12 +266,12 @@ public abstract class CMovableBase : CGameObjBas
     protected override void Start()
     {
         base.Start();
-        m_MyGameManager.AddMovableBaseListData(this);
+        m_GameObjBasManager.AddMovableBaseListData(this);
     }
 
     protected override void OnDestroy()
     {
-        m_MyGameManager.RemoveMovableBaseListData(this);
+        m_GameObjBasManager.RemoveMovableBaseListData(this);
         base.OnDestroy();
     }
 
