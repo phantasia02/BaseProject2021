@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public interface IGameObjOpenGravity
 {
@@ -8,10 +9,10 @@ public interface IGameObjOpenGravity
 }
 
 
+
 public class CGameObjBasListData
 {
     public List<CGameObjBas> m_GameObjBasListData = new List<CGameObjBas>();
-    public Hashtable m_GameObjBasHashtable = new Hashtable();
 }
 
 public abstract class CGameObjBas : MonoBehaviour
@@ -19,8 +20,7 @@ public abstract class CGameObjBas : MonoBehaviour
     public enum EObjType
     {
         eMovable            = 0,
-        eActor              = 1,
-        eTargetApple        = 2,
+        etestGamebase       = 1,
         eMax
     }
 
@@ -75,5 +75,18 @@ public abstract class CGameObjBas : MonoBehaviour
     protected virtual void OnDestroy()
     {
         m_GameObjBasManager.RemoveGameObjBasListData(this);
+    }
+
+    public virtual void ReceiveMessage(DataMessage data)
+    {
+        switch (data.m_MessageType)
+        {
+            case EMessageType.eDestroyObj:
+                Destroy(this.gameObject);
+                break;
+            //default:
+            //    Debug.LogError("Error Null Message");
+            //    break;
+        }
     }
 }

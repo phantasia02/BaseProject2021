@@ -55,9 +55,9 @@ public class CGameManager : MonoBehaviour
     [SerializeField] protected GameObject   PrefabGameSceneData             = null;
     [SerializeField] protected GameObject   m_BG                            = null;
 
-
-
     // ==================== SerializeField ===========================================
+
+    protected CGameObjBasManager m_MyGameObjBasManager = null;
 
     protected CinemachineTargetGroup m_EndCinemachineTargetGroup = null;
     protected bool isApplicationQuitting = false;
@@ -163,6 +163,7 @@ public class CGameManager : MonoBehaviour
             m_MyResultUI.Next.onClick.AddListener(OnNext);
         }
 
+        m_MyGameObjBasManager = CGameObjBasManager.SharedInstance;
         StaticGlobalDel.fixedDeltaTime = Time.fixedDeltaTime;
     }
 
@@ -263,6 +264,13 @@ public class CGameManager : MonoBehaviour
                 }
                 break;
         }
+    }
+
+    public void Update()
+    {
+        
+
+        //m_MyGameObjBasManager.
     }
 
     public void UsePlayTick()

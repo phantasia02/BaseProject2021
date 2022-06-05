@@ -1,6 +1,35 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UniRx;
+using System;
+
+public enum EMessageType
+{
+    eNull       = 0,
+    eDestroyObj = 1,
+    eUptest     = 10,
+    eMax
+}
+
+public class DataMessage
+{
+    public int              m_SendObjID         = -1;
+    public int              m_ReceiveObjID      = -1;
+    public EMessageType     m_MessageType       = EMessageType.eNull;
+
+    public List<int>        m_Listint           = null;
+    public List<float>      m_Listfloat         = null;
+    public List<string>     m_Liststring        = null;
+    public List<Vector3>    m_ListVector3       = null;
+
+    public DataMessage(int SendObjID, int ReceiveObjID, EMessageType MessageType)
+    {
+        m_SendObjID     = SendObjID;
+        m_ReceiveObjID  = ReceiveObjID;
+        m_MessageType   = MessageType;
+    }
+}
 
 public class CGameObjBasManager : CSingletonMonoBehaviour<CGameObjBasManager>
 {
@@ -16,6 +45,8 @@ public class CGameObjBasManager : CSingletonMonoBehaviour<CGameObjBasManager>
     public CActorBaseListData GetTypeActorBaseListData(CActor.EActorType type) { return m_AllActorBase[(int)type]; }
 
     // ==================== All ObjData ===========================================
+    public Hashtable m_GameObjBasHashtable = new Hashtable();
+
     protected bool isApplicationQuitting = false;
 
     void OnApplicationQuit() { isApplicationQuitting = true; }
@@ -36,7 +67,12 @@ public class CGameObjBasManager : CSingletonMonoBehaviour<CGameObjBasManager>
     // Start is called before the first frame update
     void Start()
     {
+        // ============= test ====================
+        //Observable.Timer(TimeSpan.FromSeconds(1))
+        //    .Subscribe(_ => { RemoveGameObjBas(m_AllGameObjBas[1].m_GameObjBasListData[0].GetInstanceID()); })
+        //    .AddTo(this);
 
+        // ============= test ====================
     }
 
     // Update is called once per frame
@@ -57,7 +93,7 @@ public class CGameObjBasManager : CSingletonMonoBehaviour<CGameObjBasManager>
 
         addGameObjBas.GameObjBasIndex = m_AllGameObjBas[lTempTypeIndex].m_GameObjBasListData.Count;
         m_AllGameObjBas[lTempTypeIndex].m_GameObjBasListData.Add(addGameObjBas);
-        m_AllGameObjBas[lTempTypeIndex].m_GameObjBasHashtable.Add(addGameObjBas.GetInstanceID(), addGameObjBas);
+        m_GameObjBasHashtable.Add(addGameObjBas.GetInstanceID(), addGameObjBas);
     }
 
     public void RemoveGameObjBasListData(CGameObjBas addGameObjBas)
@@ -75,7 +111,16 @@ public class CGameObjBasManager : CSingletonMonoBehaviour<CGameObjBasManager>
         for (int i = 0; i < lTempGameObjBasList.Count; i++)
             lTempGameObjBasList[i].GameObjBasIndex = i;
 
-        m_AllGameObjBas[lTempTypeIndex].m_GameObjBasHashtable.Remove(addGameObjBas.GetInstanceID());
+        m_GameObjBasHashtable.Remove(addGameObjBas.GetInstanceID());
+    }
+
+    public void RemoveGameObjBas(int InstanceID)
+    {
+        if (!m_GameObjBasHashtable.ContainsKey(InstanceID))
+            return;
+
+        CGameObjBas lTempCGameObjBas = (CGameObjBas)m_GameObjBasHashtable[InstanceID];
+        Destroy(lTempCGameObjBas.gameObject);
     }
 
     public void AddMovableBaseListData(CMovableBase addMovableBase)
@@ -123,6 +168,7 @@ public class CGameObjBasManager : CSingletonMonoBehaviour<CGameObjBasManager>
     }
 
 
+    // =============== Change Actor state Type  ========================
     public void SetAllActorTypeState(CActor.EActorType type, CMovableStatePototype.EMovableState state, int Stateindex = -1)
     {
         int index = (int)type;
@@ -132,5 +178,25 @@ public class CGameObjBasManager : CSingletonMonoBehaviour<CGameObjBasManager>
 
         foreach (var item in m_AllActorBase[index].m_ActorBaseListData)
             item.SetChangState(state, Stateindex);
+    }
+    // =============== Change Actor state Type  ========================
+
+    public void TypeSendMessage()
+    { 
+    
+    }
+
+
+
+    public void SendMessageID(DataMessage SendData)
+    {
+        if (SendData == null)
+            return;
+
+        if (!m_GameObjBasHashtable.ContainsKey(SendData.m_ReceiveObjID))
+            return;
+
+        CGameObjBas lTempCGameObjBas = (CGameObjBas)m_GameObjBasHashtable[SendData.m_ReceiveObjID];
+        lTempCGameObjBas.ReceiveMessage(SendData);
     }
 }
