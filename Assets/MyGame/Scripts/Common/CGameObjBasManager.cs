@@ -23,12 +23,12 @@ public class DataMessage
     public List<string>     m_Liststring        = null;
     public List<Vector3>    m_ListVector3       = null;
 
-    public DataMessage(int SendObjID, int ReceiveObjID, EMessageType MessageType)
-    {
-        m_SendObjID     = SendObjID;
-        m_ReceiveObjID  = ReceiveObjID;
-        m_MessageType   = MessageType;
-    }
+    //public DataMessage(int SendObjID, int ReceiveObjID, EMessageType MessageType)
+    //{
+    //    m_SendObjID     = SendObjID;
+    //    m_ReceiveObjID  = ReceiveObjID;
+    //    m_MessageType   = MessageType;
+    //}
 }
 
 public class CGameObjBasManager : CSingletonMonoBehaviour<CGameObjBasManager>
